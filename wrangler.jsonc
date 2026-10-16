@@ -8,7 +8,7 @@
     "binding": "ASSETS"
   },
   "d1_databases": [
-    { "binding": "DB", "database_name": "grandbaybiz", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+    { "binding": "DB", "database_name": "grandbaybiz", "database_id": "c4a89753-abd6-4b23-bcc2-612d8b35e96e", "migrations_dir": "migrations" }
   ],
   "r2_buckets": [
     { "binding": "PHOTOS", "bucket_name": "grandbaybiz-photos" }
