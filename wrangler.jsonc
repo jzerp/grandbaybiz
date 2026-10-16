@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "grandbaybiz",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-16",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "grandbaybiz", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [
+    { "binding": "PHOTOS", "bucket_name": "grandbaybiz-photos" }
+  ],
+  "vars": {
+    "SITE_URL": "https://grandbaybiz.com",
+    "SITE_NAME": "Grand Bay Biz",
+    "ADMIN_EMAIL": "grandbaybiz@gmail.com",
+    "CONTACT_EMAIL": "grandbaybiz@gmail.com",
+    "MAIL_FROM": "Grand Bay Biz <hello@grandbaybiz.com>"
+  }
+}

@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin
+Disallow: /edit/
+Disallow: /api/
+Sitemap: https://grandbaybiz.com/sitemap.xml
