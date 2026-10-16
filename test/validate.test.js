@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateListing, normalizeWebsite, sniffImage } from '../src/lib/validate.js';
+import { normalizeInstagram, validateListing, normalizeWebsite, sniffImage } from '../src/lib/validate.js';
 import { slugify, telHref } from '../src/lib/util.js';
 
 const good = { name: 'Bayside Handyman Co.', category: 'home', description: 'Repairs, installs and small home projects, done right.', contact_name: 'Marco Rivera', phone: '(305) 555-0142', email: 'Marco@Example.com', website: 'www.example.com' };
@@ -40,4 +40,16 @@ test('image sniffing', () => {
 test('description needs at least 30 characters', () => {
   assert.ok(validateListing({ ...good, description: 'a'.repeat(29) }).errors.description);
   assert.equal(validateListing({ ...good, description: 'a'.repeat(30) }).errors.description, undefined);
+});
+
+test('instagram: optional, accepts handle, @handle and URL, rejects junk', () => {
+  assert.equal(normalizeInstagram(''), '');
+  assert.equal(normalizeInstagram('@bay.side_co'), 'bay.side_co');
+  assert.equal(normalizeInstagram('baysideco'), 'baysideco');
+  assert.equal(normalizeInstagram('https://www.instagram.com/baysideco/?hl=en'), 'baysideco');
+  assert.equal(normalizeInstagram('has space!'), null);
+  assert.equal(normalizeInstagram('a'.repeat(31)), null);
+  assert.equal(normalizeInstagram('..bad'), null);
+  assert.equal(validateListing({ ...good, instagram: '@ok_name' }).values.instagram, 'ok_name');
+  assert.ok(validateListing({ ...good, instagram: 'no good' }).errors.instagram);
 });

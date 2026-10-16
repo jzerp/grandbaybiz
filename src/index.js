@@ -115,7 +115,7 @@ async function submit(req, env, ctx) {
   if (fd.get('company_url')) return json({ ok: true }); // honeypot: pretend success
   if (!(await turnstileOk(env, req, fd.get('cf-turnstile-response')))) return fail({}, 'We could not confirm you are a person. Please try again.');
 
-  const { ok, errors, values } = validateListing(Object.fromEntries(['name', 'category', 'description', 'contact_name', 'phone', 'email', 'website'].map((k) => [k, fd.get(k)])));
+  const { ok, errors, values } = validateListing(Object.fromEntries(['name', 'category', 'description', 'contact_name', 'phone', 'email', 'website', 'instagram'].map((k) => [k, fd.get(k)])));
   if (![1, 2, 3].every((i) => fd.get(`ack${i}`))) errors.acks = 'Please check all three boxes to continue.';
   const files = uploadedFiles(fd);
   const order = readOrder(fd, files);
@@ -158,7 +158,7 @@ async function edit(req, env, ctx, token) {
   try { fd = await req.formData(); } catch { return fail({}, 'We could not read that form. Please try again.'); }
   if (fd.get('company_url')) return json({ ok: true, heading: 'Saved.', message: '' });
 
-  const { ok, errors, values } = validateListing(Object.fromEntries(['name', 'category', 'description', 'contact_name', 'phone', 'email', 'website'].map((k) => [k, fd.get(k)])));
+  const { ok, errors, values } = validateListing(Object.fromEntries(['name', 'category', 'description', 'contact_name', 'phone', 'email', 'website', 'instagram'].map((k) => [k, fd.get(k)])));
   const files = uploadedFiles(fd);
   const order = readOrder(fd, files);
   const allowedKeys = new Set([...l.photos, ...(l.pending ? l.pending.photos : [])]);
@@ -182,8 +182,8 @@ async function edit(req, env, ctx, token) {
   if (l.status !== 'approved') {
     // Not yet live: edits replace the submission directly.
     const wasRejected = l.status === 'rejected';
-    await env.DB.prepare(`UPDATE listings SET name=?, category=?, description=?, contact_name=?, phone=?, email=?, website=?, photos=?, status='pending', admin_note=?, updated_at=? WHERE id=?`)
-      .bind(values.name, values.category, values.description, values.contact_name, values.phone, values.email, values.website, JSON.stringify(photos), wasRejected ? '' : l.admin_note, t, l.id).run();
+    await env.DB.prepare(`UPDATE listings SET name=?, category=?, description=?, contact_name=?, phone=?, email=?, website=?, instagram=?, photos=?, status='pending', admin_note=?, updated_at=? WHERE id=?`)
+      .bind(values.name, values.category, values.description, values.contact_name, values.phone, values.email, values.website, values.instagram, JSON.stringify(photos), wasRejected ? '' : l.admin_note, t, l.id).run();
     await deletePhotos(env, l.photos.filter((k) => !photos.includes(k)));
     if (wasRejected) ctx.waitUntil(sendEmail(env, mails.adminNew(env, { ...l, ...values })));
     return json({ ok: true, heading: wasRejected ? 'Sent for review.' : 'Changes saved.', message: 'Your listing is waiting for review. We will email you as soon as it is live.', statusLabel: 'Waiting for review', statusClass: 'st-pending' });
@@ -246,7 +246,7 @@ async function adminLogin(req, env) {
 function adminView(l) {
   return {
     id: l.id, slug: l.slug, status: l.status, hidden: !!l.hidden,
-    name: l.name, category: l.category, description: l.description, contact_name: l.contact_name, phone: l.phone, email: l.email, website: l.website,
+    name: l.name, category: l.category, description: l.description, contact_name: l.contact_name, phone: l.phone, email: l.email, website: l.website, instagram: l.instagram || '',
     photos: l.photos, pending: l.pending, pending_at: l.pending_at, admin_note: l.admin_note,
     created_at: l.created_at, approved_at: l.approved_at, ack_at: l.ack_at,
     changes: l.pending ? db.describeChanges(l, l.pending) : [],
@@ -263,7 +263,7 @@ async function adminExport(req, env, csv) {
   const rows = await db.listAll(env);
   const stamp = new Date().toISOString().slice(0, 10);
   if (!csv) return new Response(JSON.stringify(rows.map((l) => ({ ...adminView(l), url: `${env.SITE_URL}/${l.slug}` })), null, 2), { headers: { 'content-type': 'application/json', 'content-disposition': `attachment; filename="grandbaybiz-listings-${stamp}.json"` } });
-  const cols = ['name', 'category', 'contact_name', 'phone', 'email', 'website', 'status', 'hidden', 'created_at', 'approved_at'];
+  const cols = ['name', 'category', 'contact_name', 'phone', 'email', 'website', 'instagram', 'status', 'hidden', 'created_at', 'approved_at'];
   const q = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; };
   const lines = [[...cols, 'url', 'description'].join(',')];
   for (const l of rows) lines.push([...cols.map((c) => q(l[c])), q(`${env.SITE_URL}/${l.slug}`), q(l.description)].join(','));
@@ -279,14 +279,14 @@ async function adminAction(req, env, ctx) {
   const t = nowIso();
   const note = String(b.note || '').slice(0, 500).trim();
   const link = () => editUrl(env, l);
-  const FIELD_SQL = `name=?, category=?, description=?, contact_name=?, phone=?, email=?, website=?`;
+  const FIELD_SQL = `name=?, category=?, description=?, contact_name=?, phone=?, email=?, website=?, instagram=?`;
 
   switch (b.action) {
     case 'approve': {
       if (l.pending) {
         const p = l.pending;
         await env.DB.prepare(`UPDATE listings SET ${FIELD_SQL}, photos=?, pending_json=NULL, pending_at=NULL, updated_at=? WHERE id=?`)
-          .bind(p.name, p.category, p.description, p.contact_name, p.phone, p.email, p.website, JSON.stringify(p.photos), t, l.id).run();
+          .bind(p.name, p.category, p.description, p.contact_name, p.phone, p.email, p.website, p.instagram || '', JSON.stringify(p.photos), t, l.id).run();
         await deletePhotos(env, l.photos.filter((k) => !p.photos.includes(k)));
         ctx.waitUntil(sendEmail(env, mails.editApproved(env, { ...l, ...p })));
         return json({ ok: true, message: `Changes to ${p.name} are live. The owner was emailed.` });
@@ -323,7 +323,7 @@ async function adminAction(req, env, ctx) {
       if (l.pending) {
         await env.DB.prepare('UPDATE listings SET pending_json=?, updated_at=? WHERE id=?').bind(JSON.stringify({ ...l.pending, ...values }), t, l.id).run();
       } else {
-        await env.DB.prepare(`UPDATE listings SET ${FIELD_SQL}, updated_at=? WHERE id=?`).bind(values.name, values.category, values.description, values.contact_name, values.phone, values.email, values.website, t, l.id).run();
+        await env.DB.prepare(`UPDATE listings SET ${FIELD_SQL}, updated_at=? WHERE id=?`).bind(values.name, values.category, values.description, values.contact_name, values.phone, values.email, values.website, values.instagram, t, l.id).run();
       }
       return json({ ok: true, message: 'Details saved.' });
     }

@@ -48,13 +48,13 @@ export async function createListing(env, v, photos, ackVersion) {
   const slug = await uniqueSlug(env, v.name);
   const t = nowIso();
   const res = await env.DB.prepare(
-    `INSERT INTO listings (slug, status, name, category, description, contact_name, phone, email, website, photos, ack_version, ack_at, created_at, updated_at)
-     VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(slug, v.name, v.category, v.description, v.contact_name, v.phone, v.email, v.website, JSON.stringify(photos), ackVersion, t, t, t).run();
+    `INSERT INTO listings (slug, status, name, category, description, contact_name, phone, email, website, instagram, photos, ack_version, ack_at, created_at, updated_at)
+     VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(slug, v.name, v.category, v.description, v.contact_name, v.phone, v.email, v.website, v.instagram || '', JSON.stringify(photos), ackVersion, t, t, t).run();
   return { id: res.meta.last_row_id, slug };
 }
 
-export const FIELDS = ['name', 'category', 'description', 'contact_name', 'phone', 'email', 'website'];
+export const FIELDS = ['name', 'category', 'description', 'contact_name', 'phone', 'email', 'website', 'instagram'];
 
 // The version of a listing the owner sees in the edit form (their latest proposal, else what is live).
 export function effective(listing) {
@@ -67,7 +67,7 @@ export function effective(listing) {
 
 // Human-readable list of what differs between the live version and a proposed one.
 export function describeChanges(live, proposed) {
-  const labels = { name: 'name', category: 'category', description: 'description', contact_name: 'contact person', phone: 'phone', email: 'email', website: 'website' };
+  const labels = { name: 'name', category: 'category', description: 'description', contact_name: 'contact person', phone: 'phone', email: 'email', website: 'website', instagram: 'Instagram' };
   const out = [];
   for (const f of FIELDS) if ((live[f] || '') !== (proposed[f] || '')) out.push(`${labels[f]} updated`);
   const before = new Set(live.photos), after = new Set(proposed.photos);

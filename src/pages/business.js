@@ -17,6 +17,7 @@ export function renderBusiness(env, l, others) {
     row(ICON.phone, 'Phone', l.phone, telHref(l.phone)),
     row(ICON.mail, 'Email', l.email, `mailto:${l.email}`),
     l.website ? row(ICON.globe, 'Website', displayUrl(l.website), l.website) : '',
+    l.instagram ? row(ICON.instagram, 'Instagram', '@' + l.instagram, `https://www.instagram.com/${l.instagram}/`) : '',
   ].join('');
   const wa = `https://wa.me/?text=${encodeURIComponent(`${l.name} on Grand Bay Biz: ${url}`)}`;
   const more = others.length ? `<section class="more"><h2>More in ${esc(cat.name)}</h2><div class="minis">${others.map((m) => `<a class="mini lift" href="/${esc(m.slug)}"><div class="th">${m.photos[0] ? `<img src="${esc(photoUrl(m.photos[0]))}" alt="" loading="lazy">` : ''}</div><div><span class="nm">${esc(m.name)}</span><div class="wh">${esc(m.contact_name)}</div></div></a>`).join('')}</div></section>` : '';

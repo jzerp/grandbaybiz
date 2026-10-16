@@ -1,13 +1,13 @@
 import { CATEGORY_BY_KEY } from '../categories.js';
 
-export const ACK_VERSION = '2026-10-16';
+export const ACK_VERSION = '2026-10-16b';
 export const MIN_PHOTOS = 1;
 export const MIN_DESCRIPTION = 30;
 export const MAX_PHOTOS = 3;
 export const MAX_PHOTO_BYTES = 2.5 * 1024 * 1024; // client resizes to ~300KB; this is the hard cap
 
 export const ACK_TEXTS = [
-  'I understand that everything I submit (business name, description, photos, contact person, phone, email and website) will be shown publicly on the internet, and anyone may contact me.',
+  'I understand that everything I submit (business name, description, photos, contact person, phone, email, website and Instagram) will be shown publicly on the internet, and anyone may contact me.',
   'I own or have permission to use these photos and this text, and I allow the directory to display them.',
   'I am responsible for my business’s licenses, permits, insurance, taxes and compliance with HOA and local rules. The directory does not verify, endorse or guarantee any business.',
 ];
@@ -25,6 +25,17 @@ export function normalizeWebsite(raw) {
   } catch { return null; }
 }
 
+// Accepts "@handle", "handle" or an instagram.com URL. Returns the bare handle, '' if blank, or null if invalid.
+export function normalizeInstagram(raw) {
+  let h = clean(raw, 200);
+  if (!h) return '';
+  const m = h.match(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([^/?#]+)/i);
+  if (m) h = m[1];
+  h = h.replace(/^@+/, '');
+  if (!/^[A-Za-z0-9._]{1,30}$/.test(h) || /^\.|\.\.|\.$/.test(h)) return null;
+  return h;
+}
+
 // Validates the text fields of a listing. Returns { ok, errors, values }.
 export function validateListing(input) {
   const errors = {};
@@ -36,6 +47,7 @@ export function validateListing(input) {
     phone: clean(input.phone, 30),
     email: clean(input.email, 120).toLowerCase(),
     website: '',
+    instagram: '',
   };
   if (v.name.length < 2) errors.name = 'Please enter your business name.';
   if (!CATEGORY_BY_KEY[v.category]) errors.category = 'Please choose a category.';
@@ -47,6 +59,9 @@ export function validateListing(input) {
   const w = normalizeWebsite(input.website);
   if (w === null) errors.website = 'That website address does not look right. Leave it blank if you do not have one.';
   else v.website = w;
+  const ig = normalizeInstagram(input.instagram);
+  if (ig === null) errors.instagram = 'That Instagram name does not look right. Use just your handle, like @yourbusiness, or leave it blank.';
+  else v.instagram = ig;
   return { ok: Object.keys(errors).length === 0, errors, values: v };
 }
 

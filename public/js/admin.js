@@ -69,7 +69,7 @@
       box.appendChild(el('strong', '', 'Edit to a live listing')); box.appendChild(el('div', '', 'The current version stays public until you approve these changes.'));
       var ch = el('div', '', 'Changed: ' + (l.changes.length ? l.changes.join(', ') : 'nothing visible')); ch.style.fontWeight = '600'; box.appendChild(ch);
       detailEl.appendChild(box);
-      var labels = { name: 'Business name', category: 'Category', description: 'What they do', contact_name: 'Contact person', phone: 'Phone', email: 'Email', website: 'Website' };
+      var labels = { name: 'Business name', category: 'Category', description: 'What they do', contact_name: 'Contact person', phone: 'Phone', email: 'Email', website: 'Website', instagram: 'Instagram' };
       Object.keys(labels).forEach(function (f) {
         if ((l[f] || '') === (p[f] || '')) return;
         var row = el('div', 'cmp');
@@ -83,7 +83,7 @@
     if (state.editing) { renderEditForm(l, v); return; }
 
     var grid = el('div', 'kv');
-    grid.appendChild(kv('Contact person', v.contact_name)); grid.appendChild(kv('Phone', v.phone)); grid.appendChild(kv('Email', v.email)); grid.appendChild(kv('Website', v.website));
+    grid.appendChild(kv('Contact person', v.contact_name)); grid.appendChild(kv('Phone', v.phone)); grid.appendChild(kv('Email', v.email)); grid.appendChild(kv('Website', v.website)); grid.appendChild(kv('Instagram', v.instagram ? '@' + v.instagram : ''));
     detailEl.appendChild(grid);
     var d = el('div'); d.appendChild(el('small', '', 'What they do')); var dp = el('p', '', v.description); dp.style.cssText = 'margin:6px 0 0;font-size:17px;line-height:1.6;color:#2B454D;white-space:pre-wrap'; d.appendChild(dp); d.firstChild.style.cssText = 'display:block;font-size:13.5px;color:#4A6169'; detailEl.appendChild(d);
     var ph = el('div'); var pl = el('small', '', 'Photos (click to enlarge)'); pl.style.cssText = 'display:block;font-size:13.5px;color:#4A6169;margin-bottom:8px'; ph.appendChild(pl);
@@ -131,7 +131,7 @@
       var er = el('span', 'err'); er.setAttribute('data-err', name); w.appendChild(er); form.appendChild(w);
     }
     field('name', 'Business name'); field('category', 'Category', 'select'); field('description', 'What they do', 'textarea');
-    field('contact_name', 'Contact person'); field('phone', 'Phone'); field('email', 'Email'); field('website', 'Website');
+    field('contact_name', 'Contact person'); field('phone', 'Phone'); field('email', 'Email'); field('website', 'Website'); field('instagram', 'Instagram');
     var row = el('div', 'actions'); var save = el('button', 'btn btn-teal', 'Save details'); save.type = 'submit'; var cancel = el('button', 'btn-ghost', 'Cancel'); cancel.type = 'button';
     cancel.onclick = function () { state.editing = false; render(); }; row.appendChild(save); row.appendChild(cancel); form.appendChild(row);
     form.onsubmit = function (e) {

@@ -16,6 +16,7 @@ ${f('contact_name', 'Contact person', inp('contact_name', 'text', 'maxlength="80
 ${f('phone', 'Phone', inp('phone', 'tel', 'maxlength="30" required autocomplete="tel" placeholder="(305) 555-0100"'))}
 ${f('email', 'Email', inp('email', 'email', 'maxlength="120" required autocomplete="email" placeholder="you@example.com"'))}
 ${f('website', 'Website <span class="opt">(optional)</span>', inp('website', 'text', 'maxlength="200" inputmode="url" autocomplete="url" placeholder="www.example.com"'))}
+${f('instagram', 'Instagram <span class="opt">(optional)</span>', inp('instagram', 'text', 'maxlength="60" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@yourbusiness"'))}
 </div>`;
 }
 
