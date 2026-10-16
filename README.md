@@ -7,7 +7,7 @@ A community business directory for Grand Bay (grandbaybiz.com). Neighbors submit
 - **Email:** Resend (`RESEND_API_KEY`). Without a key, emails are printed to the log (handy locally).
 - **Access:** public site; `/admin` is protected by `ADMIN_PASSWORD` and a signed cookie (`SESSION_SECRET`).
 - **Edit links:** stateless and signed: `/edit/<id>.<hmac>`; nothing secret is stored. Bump `token_ver` on a row to revoke its link.
-- **Photos:** 2 to 3 per listing, resized in the browser before upload (`public/js/photopicker.js`), type/size checked in the Worker.
+- **Photos:** 1 to 3 per listing, resized in the browser before upload (`public/js/photopicker.js`), type/size checked in the Worker.
 
 See `SETUP.md` (first-time setup) and `OWNERS-GUIDE.md` (running it day to day).
 

@@ -36,3 +36,8 @@ test('image sniffing', () => {
   assert.equal(sniffImage(new Uint8Array([0xff, 0xd8, 0xff, 0xe0])).ext, 'jpg');
   assert.equal(sniffImage(new TextEncoder().encode('this is not an image')), null);
 });
+
+test('description needs at least 30 characters', () => {
+  assert.ok(validateListing({ ...good, description: 'a'.repeat(29) }).errors.description);
+  assert.equal(validateListing({ ...good, description: 'a'.repeat(30) }).errors.description, undefined);
+});

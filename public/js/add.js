@@ -1,7 +1,7 @@
 (function () {
   var form = document.getElementById('addform');
   if (!form) return;
-  var picker = new GBB.PhotoPicker(document.getElementById('photos'), { min: 2, max: 3, existing: [] });
+  var picker = new GBB.PhotoPicker(document.getElementById('photos'), { min: 1, max: 3, existing: [] });
   var btn = document.getElementById('sendbtn'), hint = document.getElementById('sendhint');
   var acks = Array.prototype.slice.call(form.querySelectorAll('.ack input'));
 
@@ -28,7 +28,9 @@
     e.preventDefault();
     var formerr = document.getElementById('formerr'); formerr.textContent = '';
     var errs = {};
-    if (picker.count() < 2) errs.photos = 'Please add at least 2 photos.';
+    if (picker.count() < 1) errs.photos = 'Please add at least 1 photo.';
+    var dsc = form.querySelector('[name="description"]');
+    if (dsc && dsc.value.trim().length < 30) errs.description = 'Please write at least 30 characters about what you do.';
     if (Object.keys(errs).length) { showErrors(errs); return; }
     showErrors({});
     btn.disabled = true; btn.textContent = 'Sending...';

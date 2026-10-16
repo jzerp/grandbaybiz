@@ -3,7 +3,7 @@
   if (!form) return;
   var token = form.getAttribute('data-token');
   var approved = form.getAttribute('data-approved') === '1';
-  var picker = new GBB.PhotoPicker(document.getElementById('photos'), { min: 2, max: 3, existing: JSON.parse(form.getAttribute('data-photos') || '[]') });
+  var picker = new GBB.PhotoPicker(document.getElementById('photos'), { min: 1, max: 3, existing: JSON.parse(form.getAttribute('data-photos') || '[]') });
   var btn = document.getElementById('savebtn');
 
   function showErrors(errors) {
@@ -20,7 +20,9 @@
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var formerr = document.getElementById('formerr'); formerr.textContent = '';
-    if (picker.count() < 2) { showErrors({ photos: 'Please keep at least 2 photos.' }); return; }
+    if (picker.count() < 1) { showErrors({ photos: 'Please keep at least 1 photo.' }); return; }
+    var dsc = form.querySelector('[name="description"]');
+    if (dsc && dsc.value.trim().length < 30) { showErrors({ description: 'Please write at least 30 characters about what you do.' }); return; }
     showErrors({});
     var label = btn.textContent; btn.disabled = true; btn.textContent = 'Saving...';
     var fd = new FormData(form); picker.appendTo(fd);

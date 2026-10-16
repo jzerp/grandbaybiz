@@ -1,7 +1,8 @@
 import { CATEGORY_BY_KEY } from '../categories.js';
 
 export const ACK_VERSION = '2026-10-16';
-export const MIN_PHOTOS = 2;
+export const MIN_PHOTOS = 1;
+export const MIN_DESCRIPTION = 30;
 export const MAX_PHOTOS = 3;
 export const MAX_PHOTO_BYTES = 2.5 * 1024 * 1024; // client resizes to ~300KB; this is the hard cap
 
@@ -38,7 +39,7 @@ export function validateListing(input) {
   };
   if (v.name.length < 2) errors.name = 'Please enter your business name.';
   if (!CATEGORY_BY_KEY[v.category]) errors.category = 'Please choose a category.';
-  if (v.description.length < 20) errors.description = 'Please tell neighbors a little more about what you do (at least a sentence or two).';
+  if (v.description.length < MIN_DESCRIPTION) errors.description = `Please write at least ${MIN_DESCRIPTION} characters about what you do.`;
   if (clean(input.description, 5000).length > 500) errors.description = 'Please keep the description to 500 characters.';
   if (v.contact_name.length < 2) errors.contact_name = 'Please enter a contact person.';
   if (v.phone.replace(/\D/g, '').length < 7 || !/^[\d\s()+.\-x#]+$/.test(v.phone)) errors.phone = 'Please enter a valid phone number.';

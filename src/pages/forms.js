@@ -10,7 +10,7 @@ function fields(v = {}) {
   return `
 ${f('name', 'Business name', inp('name', 'text', 'maxlength="80" required autocomplete="organization" placeholder="For example, Bayside Handyman Co."'))}
 ${f('category', 'Category', `<select id="f-category" name="category" required><option value="">Choose a category</option>${CATEGORIES.map((c) => `<option value="${c.key}"${v.category === c.key ? ' selected' : ''}>${esc(c.name)}</option>`).join('')}</select>`)}
-${f('description', 'What do you do?', `<textarea id="f-description" name="description" rows="5" maxlength="500" required placeholder="A few sentences about what you offer and who it is for.">${esc(v.description || '')}</textarea>`, '<span class="hint">Up to 500 characters.</span>')}
+${f('description', 'What do you do?', `<textarea id="f-description" name="description" rows="5" minlength="30" maxlength="500" required placeholder="A few sentences about what you offer and who it is for.">${esc(v.description || '')}</textarea>`, '<span class="hint">At least 30 and up to 500 characters.</span>')}
 <div class="grid2">
 ${f('contact_name', 'Contact person', inp('contact_name', 'text', 'maxlength="80" required autocomplete="name"'))}
 ${f('phone', 'Phone', inp('phone', 'tel', 'maxlength="30" required autocomplete="tel" placeholder="(305) 555-0100"'))}
@@ -33,7 +33,7 @@ export function renderAdd(env) {
 <form id="addform" class="panel" novalidate>
 <noscript><div class="banner warn">This form needs JavaScript to resize your photos. Please turn it on, or try another browser.</div></noscript>
 ${fields()}
-${photosBlock(`(add ${MIN_PHOTOS} to ${MAX_PHOTOS})`, 'JPG or PNG. Photos are resized automatically. The first one is your cover photo.')}
+${photosBlock(`(add 1 to ${MAX_PHOTOS})`, 'JPG or PNG. Photos are resized automatically. The first one is your cover photo.')}
 <fieldset class="acks"><legend>Before you submit</legend>${acks}
 <p class="small" style="margin:4px 0 12px">Please read the <a class="link ul" href="/terms" target="_blank">Terms of use</a> and <a class="link ul" href="/privacy" target="_blank">Privacy notice</a>. Listings are reviewed and may be edited, declined or removed at any time.</p>
 <span class="err" data-err="acks" role="alert"></span></fieldset>
@@ -81,7 +81,7 @@ export function renderEdit(env, l, values, token) {
 <div class="formwrap"><div class="formcol">
 <form id="editform" class="panel" novalidate data-token="${esc(token)}" data-photos='${esc(JSON.stringify(existing))}' data-approved="${approved ? 1 : 0}">
 ${fields(values)}
-${photosBlock(`(${MIN_PHOTOS} to ${MAX_PHOTOS})`, `JPG or PNG. Photos are resized automatically. The first one is your cover photo. You can have up to ${MAX_PHOTOS}.`)}
+${photosBlock(`(1 to ${MAX_PHOTOS})`, `JPG or PNG. Photos are resized automatically. The first one is your cover photo. You can have up to ${MAX_PHOTOS}.`)}
 <p class="small">By saving, you confirm the acknowledgements you accepted when you first submitted your listing.</p>
 <div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="company_url" tabindex="-1" autocomplete="off"></label></div>
 <div class="actions"><button type="submit" class="btn btn-teal" id="savebtn">${approved ? 'Save changes for review' : 'Save changes'}</button>${approved && !l.hidden ? `<a class="link" style="padding:10px 4px" href="/${esc(l.slug)}">Cancel</a>` : ''}</div>
